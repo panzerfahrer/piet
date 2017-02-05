@@ -1,5 +1,6 @@
 require 'png_quantizator'
 require 'piet/carrierwave_extension'
+require 'mimemagic'
 
 module Piet
   class << self
@@ -16,14 +17,20 @@ module Piet
     private
 
     def optimize_for(path, opts)
-      case mimetype(path)
-        when "png", "gif" then optimize_png(path, opts)
-        when "jpeg" then optimize_jpg(path, opts)
+      mimetype = mimetype(path)
+      if mimetype.image?
+        case mimetype.subtype
+          when "png", "gif" then optimize_png(path, opts)
+          when "jpeg" then optimize_jpg(path, opts)
+          else raise "Unsupported image type '#{mimetype.subtype}'"
+        end
+      else
+        raise "Unsupported file type '#{mimetype.to_s}'"
       end
     end
 
     def mimetype(path)
-      IO.popen(['file', '--brief', '--mime-type', path], in: :close, err: :close){|io| io.read.chomp.sub(/image\//, '')}
+      MimeMagic.by_magic(File.open(path))
     end
 
     def optimize_png(path, opts)

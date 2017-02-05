@@ -19,6 +19,7 @@ Gem::Specification.new do |s|
   s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
   s.require_paths = ["lib"]
   s.add_dependency "png_quantizator"
+  s.add_dependency "mimemagic"
   s.add_development_dependency "rspec"
   s.add_development_dependency "ZenTest"
   s.add_development_dependency "carrierwave"
